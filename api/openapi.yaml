@@ -1,0 +1,218 @@
+openapi: 3.0.1
+info:
+  title: Mingle Backend
+  description: API for Mingle Backend
+  version: "1.0"
+servers:
+  - url: "https://mingle.onrender.com"
+
+paths:
+  /api/v1/users/signup:
+    post:
+      summary: Create a user account
+      description: Create a user account
+      tags:
+        - Users
+      operationId: create_user
+      requestBody:
+        $ref: "#/components/requestBodies/UserCreate"
+      responses:
+        "201":
+          $ref: "#/components/responses/CreatedWithIDResponse"
+        "401":
+          $ref: "#/components/responses/unauthorizedError"
+        "400":
+          $ref: "#/components/responses/badRequestError"
+        "500":
+          $ref: "#/components/responses/serverError"
+  /api/v1/users/login:
+    post:
+      summary: Login user
+      description: Login user
+      tags:
+        - Users
+      operationId: login_user
+      requestBody:
+        $ref: "#/components/requestBodies/UserLogin"
+      responses:
+        "200":
+          $ref: "#/components/responses/CreatedWithTokenResponse"
+        "401":
+          $ref: "#/components/responses/unauthorizedError"
+        "400":
+          $ref: "#/components/responses/badRequestError"
+        "500":
+          $ref: "#/components/responses/serverError"
+  /api/v1/users/{user-id}:
+    parameters:
+      - $ref: "#/components/parameters/user-id"
+    get:
+      summary: Get User by ID
+      description: Get User by ID
+      tags:
+        - Users
+      operationId: get_user
+      responses:
+        "200":
+          $ref: "#/components/responses/UserResponse"
+        "401":
+          $ref: "#/components/responses/unauthorizedError"
+        "400":
+          $ref: "#/components/responses/badRequestError"
+        "500":
+          $ref: "#/components/responses/serverError"
+  
+components:
+  parameters:
+    user-id:
+      name: user-id
+      description: "An id, a time-uuid"
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      example: 724fd412-1f8b-11ec-b0b3-9801a7895a3f
+  responses:
+    unauthorizedError:
+      description: Access token is missing or invalid
+    CreatedWithIDResponse:
+      description: "Response for Successful creation of an object, contains the uuid of the created object."
+      content:
+        application/json:
+          schema:
+            type: string
+            format: uuid
+            example: 724fd412-1f8b-11ec-b0b3-9801a7895a3f
+    CreatedWithTokenResponse:
+      description: "Response for Successful login of a user object, contains the jwt token that will be used for other requests."
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+                format: jwt
+                example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE3MTIzMzU1NzcsImlkIjoiMDAwMDAwMDAtMDAwMC0wMDAwLTAwMDAtMDAwMDAwMDAwMDAwIn0.6fTROLGcLnMBhROKgEYKaB0fQUz91uPL19RTBRNk1PQ
+              user_id:
+                type: string
+                format: uuid
+                example: 79ba352a-fd7b-4b39-9e6d-be412a88036d
+    UserResponse:
+      description: Response for user object
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/User"
+    createdResponse:
+      description: "Created"
+    successResponse:
+      description: "Request Successful"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+                example: OK
+    badRequestError:
+      description: "Bad Request"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: bad request
+    notFoundRequestError:
+      description: "Not Found"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: not found
+    serverError:
+      description: "Error occured on the server. Could be as a result of invalid request"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "internal Server Error"
+    requestNotFoundError:
+      description: "File Not found error. Could be as a result bad link or change in path"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "File Not Found"
+  requestBodies:
+    UserCreate:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserCreate"
+    UserLogin:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserLogin"
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: 724fd412-1f8b-11ec-b0b3-9801a7895a3f
+        email:
+          type: string
+          example: "user@gmail.com"
+        first_name:
+          type: string
+          example: "John"
+        last_name:
+          type: string
+          example: "Doe"
+        gender:
+          type: string
+          example: "male"
+        created_at:
+          type: string
+          format: timestampz
+          example: "2024-04-17T08:47:09.547361+01:00"
+    UserCreate:
+      type: object
+      properties:
+        email:
+          type: string
+          example: "user@gmail.com"
+        first_name:
+          type: string
+          example: "John"
+        last_name:
+          type: string
+          example: "Doe"
+        password:
+          type: string
+          example: "userpassword82_"
+    UserLogin:
+      type: object
+      properties:
+        email:
+          type: string
+          example: "user@gmail.com"
+        password:
+          type: string
+          example: "userpassword82_"
