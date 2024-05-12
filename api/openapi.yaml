@@ -4,7 +4,7 @@ info:
   description: API for Mingle Backend
   version: "1.0"
 servers:
-  - url: "https://mingle.onrender.com"
+  - url: "https://mingle-v1.onrender.com"
 
 paths:
   /api/v1/users/signup:
