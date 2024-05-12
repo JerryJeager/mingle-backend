@@ -1,16 +1,19 @@
 package cmd
 
 import (
-	"os"
 	"log"
+	"os"
 
 	"github.com/JerryJeager/mingle-backend/api"
+	"github.com/JerryJeager/mingle-backend/middleware"
 	"github.com/gin-gonic/gin"
 )
 
 func ExecuteApiRoutes() {
 
 	r := gin.Default()
+	r.Use(middleware.CORSMiddleware())
+
 
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
