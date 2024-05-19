@@ -5,9 +5,12 @@ import (
 	"os"
 
 	"github.com/JerryJeager/mingle-backend/api"
+	// "github.com/JerryJeager/mingle-backend/manualwire"
 	"github.com/JerryJeager/mingle-backend/middleware"
 	"github.com/gin-gonic/gin"
 )
+
+// var userController = manualwire.GetUserController()
 
 func ExecuteApiRoutes() {
 
