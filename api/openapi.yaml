@@ -25,22 +25,6 @@ paths:
           $ref: "#/components/responses/badRequestError"
         "500":
           $ref: "#/components/responses/serverError"
-  /api/v1/users/google/signup:
-    post:
-      summary: Create a user account with google
-      description: Create a user account with google
-      tags:
-        - Users
-      operationId: create_user_google
-      responses:
-        "201":
-          $ref: "#/components/responses/CreatedWithIDResponse"
-        "401":
-          $ref: "#/components/responses/unauthorizedError"
-        "400":
-          $ref: "#/components/responses/badRequestError"
-        "500":
-          $ref: "#/components/responses/serverError"
   /api/v1/users/login:
     post:
       summary: Login user
