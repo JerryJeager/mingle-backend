@@ -6,6 +6,7 @@ import (
 
 	"os"
 
+	"github.com/JerryJeager/mingle-backend/models/users"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -40,6 +41,7 @@ func ConnectToDB(){
 		log.Fatal(err)
 	}
 
+	db.AutoMigrate(&users.User{})
 	Session =  db.Session(&gorm.Session{})
 	if Session != nil{
 		fmt.Println("success: created db session")
