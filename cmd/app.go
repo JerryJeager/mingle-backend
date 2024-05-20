@@ -33,7 +33,7 @@ func ExecuteApiRoutes() {
 
 	googleUser := v1.Group("users/google")
 
-	googleUser.POST("/signup", userController.CreateUserWithGoogle)
+	googleUser.GET("/signup", userController.CreateUserWithGoogle)
 
 
 	port := os.Getenv("PORT")
