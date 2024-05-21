@@ -29,9 +29,11 @@ func GetGoogleOauthToken(code string) (*GoogleOauthToken, error) {
 
 	query := values.Encode()
 
+	// fmt.Printf(query)
+
 	req, err := http.NewRequest("POST", rootURl, bytes.NewBufferString(query))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -41,32 +43,47 @@ func GetGoogleOauthToken(code string) (*GoogleOauthToken, error) {
 
 	res, err := client.Do(req)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to execute request: %w", err)
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
-		return nil, errors.New("could not retrieve token")
+		var resBody bytes.Buffer
+		_, err = io.Copy(&resBody, res.Body)
+		if err != nil {
+			return nil, fmt.Errorf("failed to read error response body: %w", err)
+		}
+		return nil, fmt.Errorf("failed to retrieve token, status: %d, response: %s", res.StatusCode, resBody.String())
 	}
 
 	var resBody bytes.Buffer
 	_, err = io.Copy(&resBody, res.Body)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read response body: %w", err)
 	}
 
 	var GoogleOauthTokenRes map[string]interface{}
-
 	if err := json.Unmarshal(resBody.Bytes(), &GoogleOauthTokenRes); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	}
+
+	accessToken, ok := GoogleOauthTokenRes["access_token"].(string)
+	if !ok {
+		return nil, errors.New("access_token not found or invalid type in response")
+	}
+	idToken, ok := GoogleOauthTokenRes["id_token"].(string)
+	if !ok {
+		return nil, errors.New("id_token not found or invalid type in response")
 	}
 
 	tokenBody := &GoogleOauthToken{
-		Access_token: GoogleOauthTokenRes["access_token"].(string),
-		Id_token:     GoogleOauthTokenRes["id_token"].(string),
+		Access_token: accessToken,
+		Id_token:     idToken,
 	}
 
 	return tokenBody, nil
 }
+
 
 type GoogleUserResult struct {
 	Id             string

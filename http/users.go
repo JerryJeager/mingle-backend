@@ -33,14 +33,14 @@ func (o *UserController) CreateUserWithGoogle(ctx *gin.Context){
 	tokenRes, err := utils.GetGoogleOauthToken(code)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail 1", "message": err.Error()})
 		return
 	}
 
 	google_user, err := utils.GetGoogleUser(tokenRes.Access_token, tokenRes.Id_token)
 
 	if err != nil {
-		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail", "message": err.Error()})
+		ctx.JSON(http.StatusBadGateway, gin.H{"status": "fail 2", "message": err.Error()})
 		return
 	}
 
