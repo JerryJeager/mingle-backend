@@ -5,9 +5,12 @@ import (
 	"os"
 
 	"github.com/JerryJeager/mingle-backend/api"
+	"github.com/JerryJeager/mingle-backend/manualwire"
 	"github.com/JerryJeager/mingle-backend/middleware"
 	"github.com/gin-gonic/gin"
 )
+
+var userController = manualwire.GetUserController()
 
 func ExecuteApiRoutes() {
 
@@ -27,6 +30,10 @@ func ExecuteApiRoutes() {
 	v1.GET("/info/openapi.yaml", func(c *gin.Context) {
 		c.String(200, api.OpenApiDocs())
 	})
+
+	googleUser := v1.Group("users/google")
+
+	googleUser.GET("/signup", userController.CreateUserWithGoogle)
 
 
 	port := os.Getenv("PORT")
