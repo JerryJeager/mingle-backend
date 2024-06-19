@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"github.com/JerryJeager/mingle-backend/config"
-	"github.com/JerryJeager/mingle-backend/models/users"
+	"github.com/JerryJeager/mingle-backend/models"
 	"github.com/JerryJeager/mingle-backend/utils"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -12,29 +12,39 @@ import (
 
 type UserStore interface {
 	CreateUserWithGoogle(context context.Context, user *utils.GoogleUserResult, userID uuid.UUID) error
+	GetUserID(ctx context.Context, email string) (uuid.UUID, error)
 }
 
 type UserRepo struct {
 	client *gorm.DB
 }
 
-func NewUserRepo(client *gorm.DB) *UserRepo {	
+func NewUserRepo(client *gorm.DB) *UserRepo {
 	return &UserRepo{client: client}
 }
 
 func (o *UserRepo) CreateUserWithGoogle(context context.Context, user *utils.GoogleUserResult, userID uuid.UUID) error {
-	newUser := users.User{
-		ID: userID,
-		Email: user.Email,
-		Picture: user.Picture,
+	newUser := models.User{
+		ID:       userID,
+		Email:    user.Email,
+		Picture:  user.Picture,
 		Username: utils.RandomUserName(),
 	}
-	
+
 	result := config.Session.Create(&newUser).WithContext(context)
 
-	if result.Error != nil{
+	if result.Error != nil {
 		return result.Error
 	}
 
 	return nil
+}
+
+func (o *UserRepo) GetUserID(ctx context.Context, email string) (uuid.UUID, error) {
+	var user models.User
+	query := config.Session.First(&user, "email = ?", email).WithContext(ctx)
+	if query.Error != nil {
+		return uuid.UUID{}, query.Error
+	}
+	return user.ID, nil
 }

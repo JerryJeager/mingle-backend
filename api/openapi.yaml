@@ -5,6 +5,9 @@ info:
   version: "1.0"
 servers:
   - url: "https://mingle-v1.onrender.com"
+    description: backend url
+  - url: "https://accounts.google.com"
+    description: google auth
 
 paths:
   /api/v1/users/signup:
@@ -61,7 +64,28 @@ paths:
           $ref: "#/components/responses/badRequestError"
         "500":
           $ref: "#/components/responses/serverError"
-  
+  /o/oauth2/auth:
+    parameters:
+      - $ref: "#/components/parameters/client_id"
+      - $ref: "#/components/parameters/redirect_uri"
+      - $ref: "#/components/parameters/scope"
+      - $ref: "#/components/parameters/response_type"
+    get:
+      summary: Sign in with Google auth
+      description: Sign in with Google auth
+      tags:
+        - Users
+      operationId: google_signin
+      responses:
+        "307":
+          description: redirect to frontend
+        "401":
+          $ref: "#/components/responses/unauthorizedError"
+        "400":
+          $ref: "#/components/responses/badRequestError"
+        "500":
+          $ref: "#/components/responses/serverError"
+
 components:
   parameters:
     user-id:
@@ -73,6 +97,38 @@ components:
         type: string
         format: uuid
       example: 724fd412-1f8b-11ec-b0b3-9801a7895a3f
+    client_id:
+      name: client_id
+      description: "google client id"
+      in: query
+      required: true
+      schema:
+        type: string
+      example: 5........82-e...............2pt.apps.googleusercontent.com
+    redirect_uri:
+      name: redirect_uri
+      description: "redirect backend uri"
+      in: query
+      required: true
+      schema:
+        type: string
+      example: https://mingle-v1.onrender.com/api/v1/users/google/signup
+    scope:
+      name: scope
+      description: "google auth scope"
+      in: query
+      required: true
+      schema:
+        type: string
+      example: email%20profile
+    response_type:
+      name: response_type
+      description: "google auth response type"
+      in: query
+      required: true
+      schema:
+        type: string
+      example: code
   responses:
     unauthorizedError:
       description: Access token is missing or invalid

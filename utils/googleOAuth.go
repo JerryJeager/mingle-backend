@@ -4,12 +4,12 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
 	"os"
 	"time"
-	"fmt"
 )
 
 type GoogleOauthToken struct {
@@ -84,7 +84,6 @@ func GetGoogleOauthToken(code string) (*GoogleOauthToken, error) {
 	return tokenBody, nil
 }
 
-
 type GoogleUserResult struct {
 	Id             string
 	Email          string
@@ -138,7 +137,6 @@ func GetGoogleUser(access_token string, id_token string) (*GoogleUserResult, err
 		Name:           GoogleUserRes["name"].(string),
 		Given_name:     GoogleUserRes["given_name"].(string),
 		Picture:        GoogleUserRes["picture"].(string),
-		Locale:         GoogleUserRes["locale"].(string),
 	}
 
 	return userBody, nil
