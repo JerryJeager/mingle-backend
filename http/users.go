@@ -88,6 +88,25 @@ func (o *UserController) CreateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"id": id, "username": username})
 }
 
+func (o *UserController) CreateToken(ctx *gin.Context) {
+	var user models.CreateUserReq
+
+	if err := ctx.ShouldBindJSON(&user); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "email and password is required"})
+		return
+	}
+
+	id, token, err := o.serv.CreateToken(ctx, &user)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "user with email already exists"})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{"id": id, "token": token})
+	ctx.SetCookie("user_id", id, 86400, "/", "https://we-mingle.vercel.app", false, true)
+	ctx.SetCookie("access_token", token, 86400, "/", "https://we-mingle.vercel.app", false, true)
+}
+
 func handleFrontendRedirect(ctx *gin.Context, id, token string) {
 	ctx.SetCookie("user_id", id, 86400, "/", "https://we-mingle.vercel.app", false, true)
 	ctx.SetCookie("access_token", token, 86400, "/", "https://we-mingle.vercel.app", false, true)

@@ -14,6 +14,7 @@ type UserStore interface {
 	CreateUserWithGoogle(context context.Context, user *utils.GoogleUserResult, userID uuid.UUID) error
 	GetUserID(ctx context.Context, email string) (uuid.UUID, error)
 	CreateUser(ctx context.Context, user *models.User) error
+	GetUserPassword(ctx context.Context, userEmail string) (string, error)
 }
 
 type UserRepo struct {
@@ -59,4 +60,14 @@ func (o *UserRepo) CreateUser(ctx context.Context, user *models.User) error {
 	}
 
 	return nil
+}
+
+func (o *UserRepo) GetUserPassword(ctx context.Context, userEmail string) (string, error) {
+	var userModel models.User
+
+	if err := config.Session.First(&userModel, "email = ?", userEmail).WithContext(ctx).Error; err != nil {
+		return "", err
+	}
+
+	return userModel.Password, nil
 }

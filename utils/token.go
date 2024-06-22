@@ -5,11 +5,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/JerryJeager/mingle-backend/models"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/google/uuid"
 )
 
-func GenerateToken(user models.User) (string, error) {
+func GenerateToken(id uuid.UUID) (string, error) {
 
 	tokenLifespan, err := strconv.Atoi("24")
 
@@ -19,7 +19,7 @@ func GenerateToken(user models.User) (string, error) {
 
 	claims := jwt.MapClaims{}
 	claims["authorized"] = true
-	claims["id"] = user.ID
+	claims["id"] = id
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(tokenLifespan)).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 

@@ -12,6 +12,7 @@ type UserSv interface {
 	CreateUserWithGoogle(context context.Context, user *utils.GoogleUserResult) (string, error)
 	LoginUserWithGoogle(ctx context.Context, email string) (string, string, error)
 	CreateUser(ctx context.Context, user *models.CreateUserReq) (string, string, error)
+	CreateToken(ctx context.Context, user *models.CreateUserReq) (string, string, error)
 }
 
 type UserServ struct {
@@ -44,7 +45,7 @@ func (o *UserServ) LoginUserWithGoogle(ctx context.Context, email string) (strin
 		ID: id,
 	}
 
-	token, err := utils.GenerateToken(user)
+	token, err := utils.GenerateToken(user.ID)
 	if err != nil {
 		return "", "", err
 	}
@@ -73,4 +74,31 @@ func (o *UserServ) CreateUser(ctx context.Context, user *models.CreateUserReq) (
 	}
 	return id.String(), username, nil
 
+}
+
+func (o *UserServ) CreateToken(ctx context.Context, user *models.CreateUserReq) (string, string, error) {
+	pas, err := o.repo.GetUserPassword(ctx, user.Email)
+	if err != nil {
+		return "", "", err
+	}
+
+	err = models.VerifyPassword(user.Password, pas)
+
+	if err != nil {
+		return "", "", err
+	}
+
+	id, err := o.repo.GetUserID(ctx, user.Email)
+
+	if err != nil {
+		return "", "", err
+	}
+
+	token, err := utils.GenerateToken(id)
+
+	if err != nil {
+		return "", "", err
+	}
+
+	return id.String(), token, nil
 }
