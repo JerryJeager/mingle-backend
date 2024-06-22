@@ -54,7 +54,8 @@ func (o *UserController) CreateUserWithGoogle(ctx *gin.Context) {
 			ctx.Status(http.StatusInternalServerError)
 			return
 		}
-		ctx.JSON(http.StatusOK, gin.H{"id": id, "token": token})
+		// ctx.JSON(http.StatusOK, gin.H{"id": id, "token": token})
+		handleFrontendRedirect(ctx, id, token)
 		return
 	}
 
@@ -66,6 +67,10 @@ func (o *UserController) CreateUserWithGoogle(ctx *gin.Context) {
 		return
 	}
 	// ctx.JSON(http.StatusOK, gin.H{"id": id, "token": token})
+	handleFrontendRedirect(ctx, id, token)
+}
+
+func handleFrontendRedirect(ctx *gin.Context, id, token string) {
 	ctx.SetCookie("user_id", id, 86400, "/", "localhost", false, true)
 	ctx.SetCookie("access_token", token, 86400, "/", "https://we-mingle.vercel.app", false, true)
 
