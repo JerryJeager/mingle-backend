@@ -5,6 +5,7 @@ import (
 
 	// "fmt"
 
+	"github.com/JerryJeager/mingle-backend/models"
 	"github.com/JerryJeager/mingle-backend/service/users"
 	"github.com/JerryJeager/mingle-backend/utils"
 	"github.com/gin-gonic/gin"
@@ -70,8 +71,25 @@ func (o *UserController) CreateUserWithGoogle(ctx *gin.Context) {
 	handleFrontendRedirect(ctx, id, token)
 }
 
+func (o *UserController) CreateUser(ctx *gin.Context) {
+	var user models.CreateUserReq
+
+	if err := ctx.ShouldBindJSON(&user); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "email and password is required"})
+		return
+	}
+
+	id, username, err := o.serv.CreateUser(ctx, &user)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "user with email already exists"})
+		return
+	}
+
+	ctx.JSON(http.StatusCreated, gin.H{"id": id, "username": username})
+}
+
 func handleFrontendRedirect(ctx *gin.Context, id, token string) {
-	ctx.SetCookie("user_id", id, 86400, "/", "localhost", false, true)
+	ctx.SetCookie("user_id", id, 86400, "/", "https://we-mingle.vercel.app", false, true)
 	ctx.SetCookie("access_token", token, 86400, "/", "https://we-mingle.vercel.app", false, true)
 
 	ctx.Redirect(http.StatusTemporaryRedirect, "https://we-mingle.vercel.app/dashboard")

@@ -11,6 +11,7 @@ import (
 type UserSv interface {
 	CreateUserWithGoogle(context context.Context, user *utils.GoogleUserResult) (string, error)
 	LoginUserWithGoogle(ctx context.Context, email string) (string, string, error)
+	CreateUser(ctx context.Context, user *models.CreateUserReq) (string, string, error)
 }
 
 type UserServ struct {
@@ -49,4 +50,27 @@ func (o *UserServ) LoginUserWithGoogle(ctx context.Context, email string) (strin
 	}
 
 	return id.String(), token, nil
+}
+
+func (o *UserServ) CreateUser(ctx context.Context, user *models.CreateUserReq) (string, string, error) {
+	id := uuid.New()
+	username := utils.RandomUserName()
+
+	userSt := models.User{
+		ID:       id,
+		Email:    user.Email,
+		Password: user.Password,
+		Username: username,
+	}
+
+	if err := userSt.HashPassword(); err != nil {
+		return "", "", err
+	}
+
+	err := o.repo.CreateUser(ctx, &userSt)
+	if err != nil {
+		return "", "", err
+	}
+	return id.String(), username, nil
+
 }

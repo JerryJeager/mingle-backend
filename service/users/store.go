@@ -13,6 +13,7 @@ import (
 type UserStore interface {
 	CreateUserWithGoogle(context context.Context, user *utils.GoogleUserResult, userID uuid.UUID) error
 	GetUserID(ctx context.Context, email string) (uuid.UUID, error)
+	CreateUser(ctx context.Context, user *models.User) error
 }
 
 type UserRepo struct {
@@ -47,4 +48,15 @@ func (o *UserRepo) GetUserID(ctx context.Context, email string) (uuid.UUID, erro
 		return uuid.UUID{}, query.Error
 	}
 	return user.ID, nil
+}
+
+func (o *UserRepo) CreateUser(ctx context.Context, user *models.User) error {
+
+	query := config.Session.Create(&user).WithContext(ctx)
+
+	if query.Error != nil {
+		return query.Error
+	}
+
+	return nil
 }

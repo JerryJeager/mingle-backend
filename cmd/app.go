@@ -17,13 +17,11 @@ func ExecuteApiRoutes() {
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware())
 
-
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "hello!",
 		})
 	})
-
 
 	v1 := r.Group("/api/v1")
 
@@ -35,6 +33,8 @@ func ExecuteApiRoutes() {
 
 	googleUser.GET("/signup", userController.CreateUserWithGoogle)
 
+	users := v1.Group("/users")
+	users.POST("/signup", userController.CreateUser)
 
 	port := os.Getenv("PORT")
 	if port == "" {

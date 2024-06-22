@@ -254,12 +254,6 @@ components:
         email:
           type: string
           example: "user@gmail.com"
-        first_name:
-          type: string
-          example: "John"
-        last_name:
-          type: string
-          example: "Doe"
         password:
           type: string
           example: "userpassword82_"
