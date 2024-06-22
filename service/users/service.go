@@ -13,6 +13,7 @@ type UserSv interface {
 	LoginUserWithGoogle(ctx context.Context, email string) (string, string, error)
 	CreateUser(ctx context.Context, user *models.CreateUserReq) (string, string, error)
 	CreateToken(ctx context.Context, user *models.CreateUserReq) (string, string, error)
+	GetUser(ctx context.Context, id uuid.UUID) (*models.User, error)
 }
 
 type UserServ struct {
@@ -36,7 +37,7 @@ func (o *UserServ) CreateUserWithGoogle(context context.Context, user *utils.Goo
 }
 
 func (o *UserServ) LoginUserWithGoogle(ctx context.Context, email string) (string, string, error) {
-	id, err := o.repo.GetUserID(ctx, email)
+	id, err := o.repo.GetGoogleUserID(ctx, email)
 	if err != nil {
 		return "", "", err
 	}
@@ -62,6 +63,7 @@ func (o *UserServ) CreateUser(ctx context.Context, user *models.CreateUserReq) (
 		Email:    user.Email,
 		Password: user.Password,
 		Username: username,
+		AuthType: models.Normal,
 	}
 
 	if err := userSt.HashPassword(); err != nil {
@@ -101,4 +103,8 @@ func (o *UserServ) CreateToken(ctx context.Context, user *models.CreateUserReq) 
 	}
 
 	return id.String(), token, nil
+}
+
+func (o *UserServ) GetUser(ctx context.Context, id uuid.UUID) (*models.User, error) {
+	return o.repo.GetUser(ctx, id)
 }

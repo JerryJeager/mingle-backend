@@ -9,6 +9,7 @@ import (
 	"github.com/JerryJeager/mingle-backend/service/users"
 	"github.com/JerryJeager/mingle-backend/utils"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 )
 
 type UserController struct {
@@ -88,6 +89,21 @@ func (o *UserController) CreateUser(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, gin.H{"id": id, "username": username})
 }
 
+func (o *UserController) GetUser(ctx *gin.Context) {
+	id, err := ctx.Cookie("user_id")
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	user, err := o.serv.GetUser(ctx, uuid.MustParse(id))
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "user with email already exists"})
+		return
+	}
+
+	ctx.JSON(http.StatusOK, *user)
+}
+
 func (o *UserController) CreateToken(ctx *gin.Context) {
 	var user models.CreateUserReq
 
@@ -98,7 +114,7 @@ func (o *UserController) CreateToken(ctx *gin.Context) {
 
 	id, token, err := o.serv.CreateToken(ctx, &user)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"message": "user with email already exists"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "invalid email or password"})
 		return
 	}
 

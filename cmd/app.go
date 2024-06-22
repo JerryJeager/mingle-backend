@@ -33,9 +33,13 @@ func ExecuteApiRoutes() {
 
 	googleUser.GET("/signup", userController.CreateUserWithGoogle)
 
-	users := v1.Group("/users")
+	users := v1.Group("/user")
 	users.POST("/signup", userController.CreateUser)
 	users.POST("/login", userController.CreateToken)
+
+	user := v1.Group("/user")
+	user.Use(middleware.JwtAuthMiddleware())
+	user.GET("", middleware.JwtAuthMiddleware(), userController.GetUser)
 
 	port := os.Getenv("PORT")
 	if port == "" {
