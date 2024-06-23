@@ -11,7 +11,7 @@ import (
 )
 
 type User struct {
-	ID        uuid.UUID  `json:"id" gorm:"type:uuid"`
+	ID        uuid.UUID  `json:"id" gorm:"unique"`
 	CreatedAt time.Time  `json:"created_at"`
 	UpdatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `json:"-"`
