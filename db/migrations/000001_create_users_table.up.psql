@@ -1,5 +1,5 @@
 CREATE TABLE users(
-    id           UUID,
+    id           UUID PRIMARY KEY,
     email        VARCHAR(100),
     username     VARCHAR(100) NOT NULL,
     gender       VARCHAR(50),
@@ -9,5 +9,5 @@ CREATE TABLE users(
     created_at   TIMESTAMPTZ NOT NULL,
     updated_at   TIMESTAMPTZ,
     deleted_at   TIMESTAMPTZ,
-    PRIMARY KEY(email, auth_type)
+    CONSTRAINT unique_email_auth_type UNIQUE (email, auth_type)
 );
