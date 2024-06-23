@@ -86,7 +86,7 @@ func (o *UserRepo) CreateUser(ctx context.Context, user *models.User) error {
 func (o *UserRepo) GetUserPassword(ctx context.Context, userEmail string) (string, error) {
 	var userModel models.User
 
-	if err := config.Session.First(&userModel, "email = ?", userEmail).WithContext(ctx).Error; err != nil {
+	if err := config.Session.First(&userModel, "email = ? AND auth_type = ?", userEmail, models.Normal).WithContext(ctx).Error; err != nil {
 		return "", err
 	}
 
