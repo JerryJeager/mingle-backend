@@ -16,11 +16,11 @@ type User struct {
 	UpdatedAt time.Time  `json:"-"`
 	DeletedAt *time.Time `json:"-"`
 	Username  string     `json:"username"`
-	Email     string     `json:"email" gorm:"unique"`
+	Email     string     `json:"email" gorm:"primary_key"`
 	Password  string     `json:"password"`
 	Gender    string     `json:"gender"`
 	Picture   string     `json:"picture"`
-	AuthType  string     `json:"auth_type" gorm:"unique"`
+	AuthType  string     `json:"auth_type" gorm:"primary_key"`
 }
 
 const (
