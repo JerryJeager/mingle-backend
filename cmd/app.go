@@ -37,8 +37,9 @@ func ExecuteApiRoutes() {
 	users.POST("/signup", userController.CreateUser)
 	users.POST("/login", userController.CreateToken)
 
-	user := v1.Group("/user")
-	user.GET("", middleware.JwtAuthMiddleware(), userController.GetUser)
+	user := users
+	user.Use(middleware.JwtAuthMiddleware())
+	user.GET("", userController.GetUser)
 
 	port := os.Getenv("PORT")
 	if port == "" {
