@@ -119,8 +119,8 @@ func (o *UserController) CreateToken(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{"id": id, "token": token})
-	ctx.SetCookie("user_id", id, 86400, "/", "we-mingle.vercel.app", false, true)
-	ctx.SetCookie("access_token", token, 86400, "/", "we-mingle.vercel.app", false, true)
+	ctx.SetCookie("user_id", id, 86400, "/", "localhost", false, true)
+	ctx.SetCookie("access_token", token, 86400, "/", "localhost", false, true)
 }
 
 func handleFrontendRedirect(ctx *gin.Context, id, token string) {
