@@ -90,12 +90,12 @@ func (o *UserController) CreateUser(ctx *gin.Context) {
 }
 
 func (o *UserController) GetUser(ctx *gin.Context) {
-	id, err := ctx.Cookie("user_id")
-	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+	id, ok := ctx.Get("user_id")
+	if !ok {
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "faliled to get user id from context"})
 		return
 	}
-	user, err := o.serv.GetUser(ctx, uuid.MustParse(id))
+	user, err := o.serv.GetUser(ctx, uuid.MustParse(id.(string)))
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "user with email already exists"})
 		return
