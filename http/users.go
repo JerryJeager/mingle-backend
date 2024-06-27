@@ -2,6 +2,7 @@ package http
 
 import (
 	"net/http"
+	"os"
 
 	// "fmt"
 
@@ -124,8 +125,18 @@ func (o *UserController) CreateToken(ctx *gin.Context) {
 }
 
 func handleFrontendRedirect(ctx *gin.Context, id, token string) {
-	ctx.SetCookie("user_id", id, 86400, "/", "we-mingle.vercel.app", false, true)
-	ctx.SetCookie("access_token", token, 86400, "/", "we-mingle.vercel.app", false, true)
+	environment := os.Getenv("ENVIRONMENT")
+	var path string
+	var redirect string
+	if environment == "development" {
+		path = "localhost"
+		redirect = "http://localhost:3000/dashboard"
+	} else {
+		path = "we-mingle.vercel.app"
+		redirect = "https://we-mingle.vercel.app/dashboard"
+	}
+	ctx.SetCookie("user_id", id, 86400, "/", path, false, false)
+	ctx.SetCookie("access_token", token, 86400, "/", path, false, false)
 
-	ctx.Redirect(http.StatusTemporaryRedirect, "https://we-mingle.vercel.app/dashboard")
+	ctx.Redirect(http.StatusTemporaryRedirect, redirect)
 }
