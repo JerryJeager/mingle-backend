@@ -58,7 +58,7 @@ func (o *UserController) CreateUserWithGoogle(ctx *gin.Context) {
 			return
 		}
 		// ctx.JSON(http.StatusOK, gin.H{"id": id, "token": token})
-		handleFrontendRedirect(ctx, id, token)
+		setFrontendCookies(ctx, id, token)
 		return
 	}
 
@@ -70,7 +70,7 @@ func (o *UserController) CreateUserWithGoogle(ctx *gin.Context) {
 		return
 	}
 	// ctx.JSON(http.StatusOK, gin.H{"id": id, "token": token})
-	handleFrontendRedirect(ctx, id, token)
+	setFrontendCookies(ctx, id, token)
 }
 
 func (o *UserController) CreateUser(ctx *gin.Context) {
@@ -124,7 +124,7 @@ func (o *UserController) CreateToken(ctx *gin.Context) {
 	ctx.SetCookie("access_token", token, 86400, "/", "localhost", false, true)
 }
 
-func handleFrontendRedirect(ctx *gin.Context, id, token string) {
+func setFrontendCookies(ctx *gin.Context, id, token string) {
 	environment := os.Getenv("ENVIRONMENT")
 	var domain string
 	var redirect string
@@ -138,9 +138,10 @@ func handleFrontendRedirect(ctx *gin.Context, id, token string) {
 		redirect = "https://we-mingle.vercel.app/dashboard"
 		secure = true
 	}
-	ctx.SetCookie("user_id", id, 86400, "/", domain, secure, false)
-	ctx.SetCookie("access_token", token, 86400, "/", domain, secure, false)
+	ctx.SetCookie("user_id", id, 86400, "/", domain, secure, true)
+	ctx.SetCookie("access_token", token, 86400, "/", domain, secure, true)
 	ctx.SetSameSite(http.SameSiteNoneMode)
 
+	//redirect to frontend
 	ctx.Redirect(http.StatusTemporaryRedirect, redirect)
 }
