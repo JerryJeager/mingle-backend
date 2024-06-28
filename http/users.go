@@ -147,7 +147,7 @@ func handleFrontendRedirect(ctx *gin.Context, id, token string) {
 		Domain:   domain,
 		MaxAge:   86400,
 		Secure:   secure,
-		HttpOnly: true,
+		HttpOnly: false,
 		SameSite: http.SameSiteNoneMode,
 	})
 	http.SetCookie(ctx.Writer, &http.Cookie{
@@ -157,7 +157,7 @@ func handleFrontendRedirect(ctx *gin.Context, id, token string) {
 		Domain:   domain,
 		MaxAge:   86400,
 		Secure:   secure,
-		HttpOnly: true,
+		HttpOnly: false,
 		SameSite: http.SameSiteNoneMode,
 	})
 
