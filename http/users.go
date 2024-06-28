@@ -128,15 +128,17 @@ func handleFrontendRedirect(ctx *gin.Context, id, token string) {
 	environment := os.Getenv("ENVIRONMENT")
 	var path string
 	var redirect string
+	var secure bool = false
 	if environment == "development" {
 		path = "localhost"
 		redirect = "http://localhost:3000/dashboard"
+		secure = false
 	} else {
 		path = "we-mingle.vercel.app"
 		redirect = "https://we-mingle.vercel.app/dashboard"
 	}
-	ctx.SetCookie("user_id", id, 86400, "/", path, false, false)
-	ctx.SetCookie("access_token", token, 86400, "/", path, false, false)
+	ctx.SetCookie("user_id", id, 86400, "/", path, secure, false)
+	ctx.SetCookie("access_token", token, 86400, "/", path, secure, false)
 
 	ctx.Redirect(http.StatusTemporaryRedirect, redirect)
 }
