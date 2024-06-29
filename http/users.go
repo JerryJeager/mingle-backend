@@ -1,10 +1,9 @@
 package http
 
 import (
+	"fmt"
 	"net/http"
 	"os"
-
-	// "fmt"
 
 	"github.com/JerryJeager/mingle-backend/models"
 	"github.com/JerryJeager/mingle-backend/service/users"
@@ -58,7 +57,7 @@ func (o *UserController) CreateUserWithGoogle(ctx *gin.Context) {
 			return
 		}
 		// ctx.JSON(http.StatusOK, gin.H{"id": id, "token": token})
-		setFrontendCookies(ctx, id, token)
+		handleFrontendRedirect(ctx, id, token)
 		return
 	}
 
@@ -70,7 +69,7 @@ func (o *UserController) CreateUserWithGoogle(ctx *gin.Context) {
 		return
 	}
 	// ctx.JSON(http.StatusOK, gin.H{"id": id, "token": token})
-	setFrontendCookies(ctx, id, token)
+	handleFrontendRedirect(ctx, id, token)
 }
 
 func (o *UserController) CreateUser(ctx *gin.Context) {
@@ -120,28 +119,16 @@ func (o *UserController) CreateToken(ctx *gin.Context) {
 	}
 
 	ctx.JSON(http.StatusCreated, gin.H{"id": id, "token": token})
-	ctx.SetCookie("user_id", id, 86400, "/", "localhost", false, true)
-	ctx.SetCookie("access_token", token, 86400, "/", "localhost", false, true)
 }
 
-func setFrontendCookies(ctx *gin.Context, id, token string) {
+func handleFrontendRedirect(ctx *gin.Context, id, token string) {
 	environment := os.Getenv("ENVIRONMENT")
-	var domain string
 	var redirect string
-	var secure bool
 	if environment == "development" {
-		domain = "localhost"
-		redirect = "http://localhost:3000/dashboard"
-		secure = false
+		redirect = fmt.Sprintf("http://localhost:3000/auth/login?mingle_user_id=%s&mingle_token=%s", id, token)
 	} else {
-		domain = "we-mingle.vercel.app"
-		redirect = "https://we-mingle.vercel.app/dashboard"
-		secure = true
+		redirect = fmt.Sprintf("https://we-mingle.vercel.app/auth/login?mingle_user_id=%s&mingle_token=%s", id, token)
 	}
-	ctx.SetCookie("user_id", id, 86400, "/", domain, secure, true)
-	ctx.SetCookie("access_token", token, 86400, "/", domain, secure, true)
-	ctx.SetSameSite(http.SameSiteNoneMode)
 
-	//redirect to frontend
 	ctx.Redirect(http.StatusTemporaryRedirect, redirect)
 }
